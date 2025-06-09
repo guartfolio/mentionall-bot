@@ -2,8 +2,8 @@ import asyncio
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-
-BOT_TOKEN = "8167763199:AAEBgx_xJuEercsQ470-m_LcBb_dBOA-yT8"
+import os
+BOT_TOKEN = os.getenv("8167763199:AAEBgx_xJuEercsQ470-m_LcBb_dBOA-yT8")
 
 async def mentionall(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
