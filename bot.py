@@ -7,7 +7,11 @@ from telegram.ext import (
     ApplicationBuilder, CommandHandler, MessageHandler,
     ChatMemberHandler, filters, ContextTypes
 )
+from flask import Flask
+from threading import Thread
+from dotenv import load_dotenv
 
+load_dotenv()
 BOT_TOKEN = os.getenv("8167763199:AAEBgx_xJuEercsQ470-m_LcBb_dBOA-yT8")
 DATA_FILE = "users.json"
 
@@ -22,7 +26,6 @@ if os.path.exists(DATA_FILE):
 else:
     user_map = {}
 
-# Save users to file
 def save_user_data():
     serializable_map = {
         group_id: list(users)
@@ -72,27 +75,32 @@ async def forceupdate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = str(update.effective_chat.id)
     if chat_id not in user_map:
         user_map[chat_id] = set()
-
     admins = await context.bot.get_chat_administrators(chat_id)
     for admin in admins:
         user = admin.user
         user_map[chat_id].add((user.id, user.first_name))
-
     save_user_data()
-
     await update.message.reply_text(
-        "Force update triggered! If you'd like to be included in group mentions, type anything in the chat."
+        "📢 Force update triggered! If you'd like to be included in group mentions, type anything in the chat."
     )
-
     await mention_users(chat_id, context)
 
-if __name__ == "__main__":
-    app = ApplicationBuilder().token("8167763199:AAEBgx_xJuEercsQ470-m_LcBb_dBOA-yT8").build()
+# --- Start bot + keep Replit alive with Flask ---
+app = ApplicationBuilder().token("8167763199:AAEBgx_xJuEercsQ470-m_LcBb_dBOA-yT8").build()
+app.add_handler(MessageHandler(filters.TEXT & filters.ChatType.GROUPS, track_user))
+app.add_handler(ChatMemberHandler(track_join, ChatMemberHandler.CHAT_MEMBER))
+app.add_handler(CommandHandler("mentionall", mentionall))
+app.add_handler(CommandHandler("forceupdate", forceupdate))
 
-    # ✅ Fixed filter syntax for PTB v20+
-    app.add_handler(MessageHandler(filters.TEXT & filters.ChatType.GROUPS, track_user))
-    app.add_handler(ChatMemberHandler(track_join, ChatMemberHandler.CHAT_MEMBER))
-    app.add_handler(CommandHandler("mentionall", mentionall))
-    app.add_handler(CommandHandler("forceupdate", forceupdate))
+# Fake web server for uptime pinging
+flask_app = Flask("")
 
-    app.run_polling()
+@flask_app.route("/")
+def home():
+    return "Bot is alive!"
+
+def run_flask():
+    flask_app.run(host="0.0.0.0", port=8080)
+
+Thread(target=run_flask).start()
+app.run_polling()
