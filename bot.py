@@ -18,10 +18,12 @@ async def mentionall(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     members = []
-    async for member in context.bot.get_chat_administrators(chat.id):
+    admins = await context.bot.get_chat_administrators(chat.id)
+    for member in admins:
         user = member.user
         mention = f"[👤](tg://user?id={user.id})"
         members.append(mention)
+
 
     chunk_size = 5
     for i in range(0, len(members), chunk_size):
