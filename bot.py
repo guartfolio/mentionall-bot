@@ -8,7 +8,7 @@ from telegram.ext import (
     ChatMemberHandler, filters, ContextTypes
 )
 
-BOT_TOKEN = os.getenv("8167763199:AAEBgx_xJuEercsQ470-m_LcBb_dBOA-yT8") or "8167763199:AAEBgx_xJuEercsQ470-m_LcBb_dBOA-yT8"
+BOT_TOKEN = os.getenv("8167763199:AAEBgx_xJuEercsQ470-m_LcBb_dBOA-yT8")
 DATA_FILE = "users.json"
 
 # Load users.json if it exists
