@@ -32,6 +32,6 @@ async def mentionall(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await asyncio.sleep(1)
 
 if __name__ == "__main__":
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app = ApplicationBuilder().token(8167763199:AAEBgx_xJuEercsQ470-m_LcBb_dBOA-yT8).build()
     app.add_handler(CommandHandler("mentionall", mentionall))
     app.run_polling()
