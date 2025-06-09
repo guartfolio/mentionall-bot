@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"  # 🔁 Replace this with your real token
+BOT_TOKEN = "8167763199:AAEBgx_xJuEercsQ470-m_LcBb_dBOA-yT8" 
 
 async def mentionall(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
