@@ -15,7 +15,6 @@ DATA_FILE = "users.json"
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE, "r") as f:
         user_map = json.load(f)
-        # Convert keys back to ints for IDs
         user_map = {
             group_id: set(tuple(user) for user in users)
             for group_id, users in user_map.items()
@@ -23,7 +22,7 @@ if os.path.exists(DATA_FILE):
 else:
     user_map = {}
 
-# Save to file
+# Save users to file
 def save_user_data():
     serializable_map = {
         group_id: list(users)
@@ -74,7 +73,6 @@ async def forceupdate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat_id not in user_map:
         user_map[chat_id] = set()
 
-    # Add all current admins
     admins = await context.bot.get_chat_administrators(chat_id)
     for admin in admins:
         user = admin.user
@@ -83,15 +81,18 @@ async def forceupdate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     save_user_data()
 
     await update.message.reply_text(
-        "📢 Force update triggered! If you'd like to be included in group mentions, type anything in the chat."
+        "Force update triggered! If you'd like to be included in group mentions, type anything in the chat."
     )
 
     await mention_users(chat_id, context)
 
 if __name__ == "__main__":
     app = ApplicationBuilder().token("8167763199:AAEBgx_xJuEercsQ470-m_LcBb_dBOA-yT8").build()
-    app.add_handler(MessageHandler(filters.TEXT & filters.Group(), track_user))
+
+    # ✅ Fixed filter syntax for PTB v20+
+    app.add_handler(MessageHandler(filters.TEXT & filters.ChatType.GROUPS, track_user))
     app.add_handler(ChatMemberHandler(track_join, ChatMemberHandler.CHAT_MEMBER))
     app.add_handler(CommandHandler("mentionall", mentionall))
     app.add_handler(CommandHandler("forceupdate", forceupdate))
+
     app.run_polling()
